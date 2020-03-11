@@ -4,11 +4,11 @@ declare -a gameboard
 gameboard=(1 2 3 4 5 6 7 8 9)
 function resetGameboard()
 	{
-		echo "------------"
+		echo "--------------"
 		for ((i=0;i<9;i=$i+3))
 		do
-			echo " ${gameboard[$i]}  ""|""${gameboard[$i+1]}  ""|""${gameboard[$i+2]} "
-			echo "------------"
+			echo " ${gameboard[$i]}  ""|"" ${gameboard[$i+1]}  ""|"" ${gameboard[$i+2]} "
+			echo "--------------"
 		done
 	}
 resetGameboard
@@ -18,7 +18,7 @@ function checkLetter()
 		then
 			letter="X"
 		else
-			letter="0"
+			letter="o"
 		fi
 	}
 checkLetter
@@ -33,3 +33,21 @@ function checkToss()
 		fi
 	}
 checkToss
+function chooseCell()
+	{
+		num=0
+		while [[ $num -lt 10 ]]
+		do
+			read -p "choose any position on board " position
+			for ((i=0;i<9;i++))
+			do
+				if [[ ${gameboard[$i]} == $position ]]
+				then
+					gameboard[$i]=$letter
+				fi
+			done
+		resetGameboard
+		((num=$num+1))
+		done
+	}
+chooseCell
