@@ -20,5 +20,16 @@ function checkLetter()
 		else
 			letter="0"
 		fi
-}
+	}
 checkLetter
+function checkToss()
+	{
+		toss=$((RANDOM%2))
+		if [ $toss == 1 ]
+		then
+			echo "player 1 first play "
+		else
+			echo "player 2 first play "
+		fi
+	}
+checkToss
