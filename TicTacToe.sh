@@ -41,7 +41,7 @@ function chooseCell()
 			read -p "choose any position on board " position
 			for ((i=0;i<9;i++))
 			do
-				if [[ ${gameboard[$i]} == $position ]]
+				if [[ ${gameboard[$i]} -eq $position ]]
 				then
 					gameboard[$i]=$letter
 				fi
