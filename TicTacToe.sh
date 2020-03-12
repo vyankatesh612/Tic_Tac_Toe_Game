@@ -1,7 +1,10 @@
 #!/bin/bash -x
 echo "Wel-Come To Tic-Tac-Toe Game ..!"
+
 declare -a gameboard
+
 gameboard=(1 2 3 4 5 6 7 8 9)
+
 function resetGameboard()
 	{
 		echo "--------------"
@@ -18,94 +21,124 @@ function checkToss()
 		toss=$((RANDOM%2))
 		if [ $toss == 1 ]
 		then
-			player="player-1"
+			player="USER"
 			letter="o"
 		else
-			player="player-2"
+			player="COMPUTER"
 			letter="x"
 		fi
 		chooseCell $player $letter
 	}
+
 function playerturn()
 	{
-		if [ $player == "player-1" ]
+		if [ $player == "USER" ]
 		then
-			player="player-2"
+			player="COMPUTER"
 			letter="x"
 		else
-			player="player-1"
+			player="USER"
 			letter="o"
 		fi
-		chooseCell $player $letter
+			chooseCell $player $letter
 	}
+
+num=1
 function chooseCell()
 	{
-		num=0
-		while [[ $num -lt 10 ]]
+		while [[ true ]]
 		do
-			read -p "$player : choose any position on board " position
-			for ((i=0;i<9;i++))
-			do
-				if [[ ${gameboard[$i]} -eq $position ]]
-				then
-					gameboard[$i]=$letter
-				fi
-			done
+			if [ $player == USER ]
+			then
+				read -p "choose any position on board " position
+			else
+				position=$((RANDOM%9 + 1))
+        	fi
+
+			if [[ ${gameboard[$position-1]} -eq $position && ${gameboard[$position-1]} -ne "x" && ${gameboard[$position-1]} -ne "o" ]]
+			then
+				gameboard[$position-1]=$letter
+			else
+				echo "Invalid Position ..Choose Another one ..."
+				chooseCell $player $letter
+			fi
+
 			resetGameboard
-			((num=$num+1))
 
 			checkwinner $letter
 
-			if [[ $win == 1 ]]
-			then
-				echo "$player win"
-				break;
-			fi
+			if [ $num -gt 8 ]
+      	then
+         	echo "Tie"
+				exit
+      	fi
+
+      	((num=$num+1))
+
 			playerturn $player
+		
 		done
 	}
 function checkwinner()
 	{
 		input=$1
 		symbol=$input$input$input
+		checkRowwin $symbol
+		checkColumnwin $symbol
+		checkDigonalwin $symbol
+
+	}
+#check rows for winning condition
+function checkRowwin()
+	{
 		arrangement=" "
-		#check rows for winning condition
 		for ((i=0;i<9;i=$i+3))
       do
       	arrangement=${gameboard[$i]}${gameboard[$i+1]}${gameboard[$i+2]}
 			if [ $arrangement == $symbol ]
 			then
-				win=1
-				echo $win
+				displayWin $player
 			fi
 		done
-		#check columns for winning condition
+	}
+#check columns for winning condition
+function checkColumnwin()
+	{
 		arrangement=" "
 		for ((i=0;i<3;i++))
       do
          arrangement=${gameboard[$i]}${gameboard[$i+3]}${gameboard[$i+6]}
          if [ $arrangement == $symbol ]
          then
-            win=1
-            echo $win
+				displayWin $player
          fi
       done
-		#check diagonal for winning condition
+	}
+#check diagonal for winning condition
+function checkDigonalwin()
+	{
 		arrangement=" "
 		arrangement=${gameboard[0]}${gameboard[4]}${gameboard[8]}
 		if [ $arrangement == $symbol ]
-		then 
-			win=1
-			echo $win
-		fi
+		then
+			displayWin $player
+		fi 
 		arrangement=" "
       arrangement=${gameboard[2]}${gameboard[4]}${gameboard[6]}
       if [ $arrangement == $symbol ]
-      then 
-         win=1
-         echo $win
+      then
+			displayWin $player
       fi
-
+	}
+function displayWin()
+	{
+		if [ $player == USER ]
+		then
+			echo "Congratulation .. YOU WON...!"
+		else
+			echo "Sorry..YOU LOST...!"
+		fi
+		exit
 	}
 
 checkToss
