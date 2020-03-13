@@ -1,6 +1,6 @@
 #!/bin/bash -x
 echo "Wel-Come To Tic-Tac-Toe Game ..!"
-
+moves=1
 declare -a gameboard
 
 gameboard=(1 2 3 4 5 6 7 8 9)
@@ -47,7 +47,6 @@ function playerturn()
 
 function checkuserCell()
 	{
-		local moves=1
 		while [[ true ]]
 		do
 			read -p "choose any position on board " position
@@ -72,20 +71,29 @@ function checkuserCell()
 
 function checkcomputerCell()
 	{
-		local moves=1
 		while [[ true ]]
 		do
-		value=$1
-		computermoveforRow $letter 
-		if [ $value == 0 ]
+		
+		if [[ $(computermoveforRow $letter) == 1 ]]
 		then
-			computermoveforColumn $letter
-		fi
-		if [ $value == 0 ]
+			resetGameboard
+		elif [[ $(computermoveforColumn $letter) == 1 ]]
 		then
-			computermoveforDigonal $letter
+			resetGameboard
+		elif [[ $(computermoveforDiagonal $letter) == 1 ]]
+		then
+			resetGameboard
+		else
+			position=$((RANDOM%9 + 1))
+			if [[ ${gameboard[$position-1]} -eq $position && ${gameboard[$position-1]} -ne "x" && ${gameboard[$position-1]} -ne "o" ]]
+         then
+            gameboard[$position-1]=$letter
+         else
+            checkcomputerCell  $letter
+         fi
+
+			resetGameboard
 		fi
-		resetGameboard
 
 		checkwinner $letter
 
@@ -98,7 +106,7 @@ function checkcomputerCell()
 function checkTie()
 	{
 		moves=$1
-		if [ $moves -gt 4 ]
+		if [ $moves -gt 8 ]
 		then
 			echo "Tie"
 			exit
@@ -115,7 +123,7 @@ function checkwinner()
 		checkDigonalwin $symbol
 
 	}
-#check rows for winning condition
+
 function checkRowwin()
 	{
 		arrangement=" "
@@ -128,7 +136,7 @@ function checkRowwin()
 			fi
 		done
 	}
-#check columns for winning condition
+
 function checkColumnwin()
 	{
 		arrangement=" "
@@ -141,7 +149,7 @@ function checkColumnwin()
          fi
       done
 	}
-#check diagonal for winning condition
+
 function checkDigonalwin()
 	{
 		arrangement=" "
@@ -156,16 +164,6 @@ function checkDigonalwin()
       then
 			displayWin $player
       fi
-	}
-function displayWin()
-	{
-		if [ $player == USER ]
-		then
-			echo "Congratulation .. YOU WON...!"
-		else
-			echo "Sorry..YOU LOST...!"
-		fi
-		exit
 	}
 
 function computermoveforRow()
@@ -192,7 +190,7 @@ function computermoveforRow()
 				flag=0
 			fi
 		done
-		checkcomputerCell $flag
+		echo  $flag
 	}
 
 function computermoveforColumn()
@@ -219,6 +217,39 @@ function computermoveforColumn()
 				flag=0
          fi
       done
+		echo $flag
+	}
+
+function computermoveforDiagonal()
+	{
+		if [[ ${gameboard[0]} == $1 && ${gameboard[4]} == $1 && ${gameboard[8]} == 9 ]]
+         then
+            flag=1
+            position=8
+            gameboard[$position]=$letter
+		elif [[ ${gameboard[0]} == $1 && ${gameboard[4]} == 5 && ${gameboard[8]} == $1 ]]
+    	then
+            flag=1
+            position=4
+            gameboard[$position]=$letter
+		elif [[ ${gameboard[0]} == 1 && ${gameboard[4]} == $1 && ${gameboard[8]} == $1 ]]
+      then
+            flag=1
+            position=0
+            gameboard[$position]=$letter
+		fi
+		echo $flag
+	}
+
+function displayWin()	
+	{
+		if [ $player == USER ]
+		then
+			echo "Congratulation .. YOU WON...!"
+		else
+			echo "Sorry..YOU LOST...!"
+   	fi
+      exit
 	}
 
 checkToss
