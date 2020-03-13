@@ -27,7 +27,7 @@ function checkToss()
 		else
 			player="COMPUTER"
 			letter="x"
-			checkcomputerCell  
+			checkcomputerCell $player $letter  
 		fi
 	}
 
@@ -37,7 +37,7 @@ function playerturn()
 		then
 			player="COMPUTER"
 			letter="x"
-			checkcomputerCell  
+			checkcomputerCell $player $letter 
 		else
 			player="USER"
 			letter="o"
@@ -62,7 +62,7 @@ function checkuserCell()
 
 			checkwinner $letter
 
-      	((moves=$moves+1))
+			((moves=$moves+1))
 
 			checkTie $moves
 		done
@@ -74,32 +74,31 @@ function checkcomputerCell()
 		while [[ true ]]
 		do
 		
-		if [[ $(computermoveforRow $letter) == 1 ]]
-		then
-			resetGameboard
-		elif [[ $(computermoveforColumn $letter) == 1 ]]
-		then
-			resetGameboard
-		elif [[ $(computermoveforDiagonal $letter) == 1 ]]
-		then
-			resetGameboard
-		else
-			position=$((RANDOM%9 + 1))
-			if [[ ${gameboard[$position-1]} -eq $position && ${gameboard[$position-1]} -ne "x" && ${gameboard[$position-1]} -ne "o" ]]
-         then
-            gameboard[$position-1]=$letter
-         else
-            checkcomputerCell  $letter
-         fi
+			if [[ $(computermoveforRow $letter) == 1 ]]
+			then
+				resetGameboard
+			elif [[ $(computermoveforColumn $letter) == 1 ]]
+			then
+				resetGameboard
+			elif [[ $(computermoveforDiagonal $letter) == 1 ]]
+			then
+				resetGameboard
+			else
+				position=$((RANDOM%9 + 1))
+				if [[ ${gameboard[$position-1]} -eq $position && ${gameboard[$position-1]} -ne "x" && ${gameboard[$position-1]} -ne "o" ]]
+				then
+					gameboard[$position-1]=$letter
+				else
+					checkcomputerCell  $letter
+				fi
 
-			resetGameboard
-		fi
+				resetGameboard
+			fi
+			checkwinner $letter
 
-		checkwinner $letter
+			((moves=$moves+1))
 
-		((moves=$moves+1))
-
-		 checkTie $moves
+			checkTie $moves
 		done
 	}
 
@@ -128,8 +127,8 @@ function checkRowwin()
 	{
 		arrangement=" "
 		for ((i=0;i<9;i=$i+3))
-      do
-      	arrangement=${gameboard[$i]}${gameboard[$i+1]}${gameboard[$i+2]}
+		do
+			arrangement=${gameboard[$i]}${gameboard[$i+1]}${gameboard[$i+2]}
 			if [ $arrangement == $symbol ]
 			then
 				displayWin $player
@@ -141,13 +140,13 @@ function checkColumnwin()
 	{
 		arrangement=" "
 		for ((i=0;i<3;i++))
-      do
-         arrangement=${gameboard[$i]}${gameboard[$i+3]}${gameboard[$i+6]}
-         if [ $arrangement == $symbol ]
-         then
+		do
+			arrangement=${gameboard[$i]}${gameboard[$i+3]}${gameboard[$i+6]}
+			if [ $arrangement == $symbol ]
+			then
 				displayWin $player
-         fi
-      done
+			fi
+		done
 	}
 
 function checkDigonalwin()
@@ -159,11 +158,11 @@ function checkDigonalwin()
 			displayWin $player
 		fi 
 		arrangement=" "
-      arrangement=${gameboard[2]}${gameboard[4]}${gameboard[6]}
-      if [ $arrangement == $symbol ]
-      then
+		arrangement=${gameboard[2]}${gameboard[4]}${gameboard[6]}
+		if [ $arrangement == $symbol ]
+		then
 			displayWin $player
-      fi
+		fi
 	}
 
 function computermoveforRow()
@@ -177,14 +176,14 @@ function computermoveforRow()
 				position=$((i+2))	
 				gameboard[$position]=$letter
 			elif [[ ${gameboard[$i]} == $1 && ${gameboard[$i+1]} == $((i+2)) && ${gameboard[$i+2]} == $1 ]]
-         then
+			then
 				flag=1
-            position=$((i+1))
+				position=$((i+1))
 				gameboard[$position]=$letter
 			elif [[ ${gameboard[$i]} == $((i+1)) && ${gameboard[$i+1]} == $1 && ${gameboard[$i+2]} == $1 ]]
-         then
+			then
 				flag=1
-            position=$i
+				position=$i
 				gameboard[$position]=$letter
 			else
 				flag=0
@@ -204,39 +203,39 @@ function computermoveforColumn()
 				position=$((i+6))
 				gameboard[$position]=$letter
 			elif [[ ${gameboard[$i]} == $1 && ${gameboard[$i+3]} == $((i+4)) && ${gameboard[$i+6]} == $1 ]]
-         then
+			then
 				flag=1
-            position=$((i+3))
+				position=$((i+3))
 				gameboard[$position]=$letter
 			elif [[ ${gameboard[$i]} == $((i+1)) && ${gameboard[$i+3]} == $((i+2)) && ${gameboard[$i+6]} == $1 ]]
-         then
+			then
 				flag=1
-            position=$i
+				position=$i
 				gameboard[$position]=$letter
 			else
 				flag=0
-         fi
-      done
+			fi
+		done
 		echo $flag
 	}
 
 function computermoveforDiagonal()
 	{
 		if [[ ${gameboard[0]} == $1 && ${gameboard[4]} == $1 && ${gameboard[8]} == 9 ]]
-         then
-            flag=1
-            position=8
-            gameboard[$position]=$letter
+		then
+			flag=1
+			position=8
+			gameboard[$position]=$letter
 		elif [[ ${gameboard[0]} == $1 && ${gameboard[4]} == 5 && ${gameboard[8]} == $1 ]]
-    	then
-            flag=1
-            position=4
-            gameboard[$position]=$letter
+		then
+			flag=1
+			position=4
+			gameboard[$position]=$letter
 		elif [[ ${gameboard[0]} == 1 && ${gameboard[4]} == $1 && ${gameboard[8]} == $1 ]]
-      then
-            flag=1
-            position=0
-            gameboard[$position]=$letter
+		then
+			flag=1
+			position=0
+			gameboard[$position]=$letter
 		fi
 		echo $flag
 	}
@@ -248,8 +247,8 @@ function displayWin()
 			echo "Congratulation .. YOU WON...!"
 		else
 			echo "Sorry..YOU LOST...!"
-   	fi
-      exit
+		fi
+		exit
 	}
 
 checkToss
