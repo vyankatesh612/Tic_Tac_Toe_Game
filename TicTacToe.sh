@@ -15,7 +15,7 @@ function resetGameboard()
 		done
 	}
 resetGameboard
-
+ 
 function checkToss()
 	{
 		toss=$((RANDOM%2))
@@ -23,11 +23,12 @@ function checkToss()
 		then
 			player="USER"
 			letter="o"
+			checkuserCell $player $letter
 		else
 			player="COMPUTER"
 			letter="x"
+			checkcomputerCell  
 		fi
-		chooseCell $player $letter
 	}
 
 function playerturn()
@@ -36,49 +37,75 @@ function playerturn()
 		then
 			player="COMPUTER"
 			letter="x"
+			checkcomputerCell  
 		else
 			player="USER"
 			letter="o"
+			checkuserCell $player $letter 
 		fi
-			chooseCell $player $letter
 	}
 
-num=1
-function chooseCell()
+function checkuserCell()
 	{
+		local moves=1
 		while [[ true ]]
 		do
-			if [ $player == USER ]
-			then
-				read -p "choose any position on board " position
-			else
-				position=$((RANDOM%9 + 1))
-        	fi
-
+			read -p "choose any position on board " position
 			if [[ ${gameboard[$position-1]} -eq $position && ${gameboard[$position-1]} -ne "x" && ${gameboard[$position-1]} -ne "o" ]]
 			then
 				gameboard[$position-1]=$letter
 			else
 				echo "Invalid Position ..Choose Another one ..."
-				chooseCell $player $letter
+				checkuserCell  $letter
 			fi
 
 			resetGameboard
 
 			checkwinner $letter
 
-			if [ $num -gt 8 ]
-      	then
-         	echo "Tie"
-				exit
-      	fi
+      	((moves=$moves+1))
 
-      	((num=$num+1))
+			checkTie $moves
+		done
 
-			playerturn $player
-		
+	}
+
+function checkcomputerCell()
+	{
+		local moves=1
+		while [[ true ]]
+		do
+		value=$1
+		computermoveforRow $letter 
+		if [ $value == 0 ]
+		then
+			computermoveforColumn $letter
+		fi
+		if [ $value == 0 ]
+		then
+			computermoveforDigonal $letter
+		fi
+		resetGameboard
+
+		checkwinner $letter
+
+		((moves=$moves+1))
+
+		 checkTie $moves
 		done
 	}
+
+function checkTie()
+	{
+		moves=$1
+		if [ $moves -gt 4 ]
+		then
+			echo "Tie"
+			exit
+		fi
+		playerturn $player
+	}
+
 function checkwinner()
 	{
 		input=$1
@@ -141,4 +168,58 @@ function displayWin()
 		exit
 	}
 
+function computermoveforRow()
+	{
+		local flag=0
+		for ((i=0;i<9;i=$i+3))
+		do
+			if [[ ${gameboard[$i]} == $1 && ${gameboard[$i+1]} == $1 && ${gameboard[$i+2]} == $((i+3)) ]]
+			then
+				flag=1
+				position=$((i+2))	
+				gameboard[$position]=$letter
+			elif [[ ${gameboard[$i]} == $1 && ${gameboard[$i+1]} == $((i+2)) && ${gameboard[$i+2]} == $1 ]]
+         then
+				flag=1
+            position=$((i+1))
+				gameboard[$position]=$letter
+			elif [[ ${gameboard[$i]} == $((i+1)) && ${gameboard[$i+1]} == $1 && ${gameboard[$i+2]} == $1 ]]
+         then
+				flag=1
+            position=$i
+				gameboard[$position]=$letter
+			else
+				flag=0
+			fi
+		done
+		checkcomputerCell $flag
+	}
+
+function computermoveforColumn()
+	{
+		local flag=0
+		for ((i=0;i<3;i++))
+		do
+			if [[ ${gameboard[$i]} == $1 && ${gameboard[$i+3]} == $1 && ${gameboard[$i+6]} == $((i+7)) ]]
+			then
+				flag=1
+				position=$((i+6))
+				gameboard[$position]=$letter
+			elif [[ ${gameboard[$i]} == $1 && ${gameboard[$i+3]} == $((i+4)) && ${gameboard[$i+6]} == $1 ]]
+         then
+				flag=1
+            position=$((i+3))
+				gameboard[$position]=$letter
+			elif [[ ${gameboard[$i]} == $((i+1)) && ${gameboard[$i+3]} == $((i+2)) && ${gameboard[$i+6]} == $1 ]]
+         then
+				flag=1
+            position=$i
+				gameboard[$position]=$letter
+			else
+				flag=0
+         fi
+      done
+	}
+
 checkToss
+
